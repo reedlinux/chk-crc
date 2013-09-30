@@ -1,0 +1,1322 @@
+   1    GENISYS_II PROGRAM NV_CP784_R1;
+   2    
+   3    /*
+   4 // --------------------------------------------------------------------------------
+   5 // 
+   6 // PROJECT: SUNRAIL 
+   7 // LOCATION: CP 784 (MP 784.65)
+   8 // PROGRAM NAME: NV_CP784_R1
+   9 // DATE: SEPTEMBER 21, 2012
+  10 // DESIGNER: NST
+  11 // CHECKER: NST
+  12 // 
+  13 // ------------------------------- WARNING ----------------------------------------
+  14 // 
+  15 // PRIOR TO PLACING THIS PROGRAM SET FORTH IN THIS LISTING INTO REVENUE SERVICE, 
+  16 // THE PROGRAM AND THE COMPLETE SYSTEM OF WHICH THIS PROGRAM IS A PART MUST BE 
+  17 // SERVICE (OPERATION) TESTED. THIS PROGRAM IS PART OF A VITAL SYSTEM. ANY CHANGES MADE TO THIS PROGRAM CAN COMPROMISE THE SAFE PERFORMANCE AND OPERATION.
+  18 // 
+  19 // --------------------------------------------------------------------------------
+  20 // 
+  21 // PROGRAM HISTORY & REVISION LEVEL
+  22 // 
+  23 // Rev 0.0  - 09/12/12 - New program, NV_CP784, for location CP 784 (MP 784.65) on 
+  24 // the SunRail Project.  Program based on NVNWEOS_R0 (CSX Typical - last    revised Rev 0 - 06/23/2006) and NVEOS100 (CSX Typical Non-Vital VHLC program, dated 11/21/2003), with all options removed; this program written to be location specific.
+  25 // 
+  26 // Rev 0.1  - 09/17/12 - As Simulated.
+  27 // 
+  28 // Rev 1.0  - 09/21/12 - As Checked.
+  29 // 
+  30 // 
+  31 // DATE		REVISION LEVEL	DESCRIPTION		CHANGED BY		CRC#/CHK#
+  32 // 
+  33 // 09/12/12	REV 0.0		As Designed		NST/NST		7A33/3C79
+  34 // 09/17/12	REV 0.1		As Simulated	NST/NST		30C9/384D
+  35 // 09/21/12	REV 1.0		As Checked		NST/NST		3041/381B
+  36 // 04/30/13	REV 1.1		Added MOAS		SigSth/SWR		4687/4e9b
+  37 // 
+  38 // 
+  39 // --------------------------------------------------------------------------------
+  40 // 
+  41 // PROGRAM NOTES:
+  42 // 
+  43 // - CSX Typical (NVNWEOS_R0) program, Rev 0 last dated 06/23/2006, and NVEOS100 (CSX Typical Non-Vital VHLC program, dated 11/21/2003) used as typical programs for writing this CP 784 program.
+  44 // - This CP 784 program has been written to be location specific, with all 
+  45 //    program and configurable options removed as shown in CSX typical.
+  46 // - This CP 784 program has been written based on the CP 784 hardware design,
+  47 // NEW WORK, ASTS/TDA 02/17/12 (no revisions shown in revision block), last received via email on 08/30/12.
+  48 // 
+  49 // --------------------------------------------------------------------------------
+  50 // 
+  51 // */
+  52    
+  53    INTERFACE
+  54    
+  55    COMM /* SERIAL COMMUNICATIONS */
+  56    
+  57    LINK: MLK_II
+  58    ADJUSTABLE ENABLE: 1
+  59    PROTOCOL: GENISYS.MASTER
+  60    ADJUSTABLE PORT: 1;
+  61    ADJUSTABLE BAUD: 9600;
+  62    ADJUSTABLE STOPBITS: 1;
+  63    ADJUSTABLE PARITY: NONE;
+  64    ADJUSTABLE KEY.ON.DELAY: 12;
+  65    ADJUSTABLE KEY.OFF.DELAY: 12;
+  66    ADJUSTABLE STALE.DATA.TIMEOUT: 5: SEC;
+  67    ADJUSTABLE CARRIER.MODE: CONSTANT;
+  68    ADJUSTABLE POINT.POINT: 1;
+  69    ADJUSTABLE CRC.SIZE: 16;
+  70    
+  71    ADDRESS: 1 
+  72    /* USE ADDRESS 0 TO MAKE ADDRESS ADJUSTABLE */
+  73    
+  74    ADJUSTABLE ENABLE: 1 
+  75    
+  76    NV.OUTPUT:
+  77           1NWSR,		1RWSR,		2GSR,			4_6GSR,
+  78           CSTOPR,		SPARE,		ECSON,		ECSOFF,	
+  79           2TBON,		2TBOFF,		4TBON, 		4TBOFF,
+  80           6TBON,		6TBOFF, 		SPARE,		MOSR,
+  81           LSRESREQ,		HEALTH,		OFFICELINK,		RADIOLINK, 
+  82           SPARE,		SPARE,		FLTS,			FLTSO;
+  83    
+  84    NV.INPUT: 
+  85           1NWCKR,		1RWCKR,		1WCBKR, 		1NJPKR,
+  86           2RGPKR, 		4RGPKR, 		6RGPKR, 		TEKR,
+  87           2TKR, 		2AKR, 		4AKR, 		6AKR,
+  88           2AAKR,		4AAKR,		6AAKR,		2MKR,
+  89           4MKR,			6MKR,			SPARE,		SPARE,
+  90           2TBKR,		4TBKR,		6TBKR,		SPARE, 
+  91           2LSKR,		4LSKR,		6LSKR,		1LKR,
+  92           MOKR,			POKR,			LOKR,			ECKR, 
+  93           1NWSKR,		1RWSKR,		2GZSKR,		4_6GZSKR,
+  94           2TBZNKR,		2TBZFKR,		4TBZNKR,		4TBZFKR,	
+  95           6TBZNKR,		6TBZFKR,		SPARE,		FLTKR,
+  96           SMOKR,		SPARE,		SPARE,		SPARE;
+  97    
+  98    
+  99    
+ 100    LINK: GEN_OFFICE
+ 101    ADJUSTABLE ENABLE: 0 
+ 102    PROTOCOL: GENISYS.SLAVE
+ 103    ADJUSTABLE PORT: 3;
+ 104    ADJUSTABLE BAUD: 9600;
+ 105    ADJUSTABLE STOPBITS: 1;
+ 106    ADJUSTABLE PARITY: NONE;
+ 107    ADJUSTABLE KEY.ON.DELAY: 12;
+ 108    ADJUSTABLE KEY.OFF.DELAY: 12;
+ 109    ADJUSTABLE STALE.DATA.TIMEOUT: 5: SEC;
+ 110    ADJUSTABLE CARRIER.MODE: KEYED;
+ 111    ADJUSTABLE POINT.POINT: 1;
+ 112    ADJUSTABLE CRC.SIZE: 16;
+ 113    
+ 114    ADDRESS: 0 
+ 115    
+ 116    ADJUSTABLE ENABLE: 1 
+ 117    
+ 118    NV.OUTPUT:
+ 119           1NWK_GEN,		1RWK_GEN,		1LK_GEN,		1NJK_GEN,
+ 120    2GK_GEN,		4_6GK_GEN,		TEK_GEN,		SPARE,		
+ 121           2TK_GEN,		SPARE,		2AK_GEN,		4AK_GEN,
+ 122           6AK_GEN,		2AAK_GEN,		4AAK_GEN,		6AAK_GEN,		
+ 123           2TBK_GEN, 		4TBK_GEN,		6TBK_GEN,		2BDK_GEN,		
+ 124           4BDK_GEN,		6BDK_GEN,		POK_GEN,		LOK_GEN,
+ 125           ECK_GEN,		FLTK_GEN, 		SMOK_GEN, 		MOK_GEN,
+ 126           SPARE,		SPARE,		SPARE,		SPARE;
+ 127           
+ 128    NV.INPUT:
+ 129           C1NWS_GEN,		C1RWS_GEN,		SPARE,		SPARE,
+ 130           C2GS_GEN,		C4_6GS_GEN,		CSTOP_GEN,		SPARE,
+ 131           C2TBS_GEN,		C2TBSO_GEN,		C4TBS_GEN,		C4TBSO_GEN, 
+ 132           C6TBS_GEN,		C6TBSO_GEN,		SPARE,		SPARE,
+ 133           SPARE,		SPARE,		SPARE,		SPARE,
+ 134           SPARE,		SPARE,		SPARE,		SPARE,
+ 135           CECS_GEN,		CECSO_GEN,		CFLTS_GEN,		CFLTSO_GEN,
+ 136           CMOAS_GEN,		CMOASO_GEN,		SPARE,		SPARE;
+ 137           
+ 138    
+ 139    
+ 140    LINK: ATCS_OFFICE
+ 141    ADJUSTABLE ENABLE: 0
+ 142    PROTOCOL: ATCS.SLAVE
+ 143    ADJUSTABLE PORT: 3;
+ 144    ADJUSTABLE BAUD: 9600;
+ 145                                                              
+ 146    ADJUSTABLE POLLING.TIMEOUT:  500:MSEC;                    /*******************/
+ 147    ADJUSTABLE POLLING.INTERVAL: 1000:MSEC;                   /* Typical values  */
+ 148    ADJUSTABLE HDLC.FAIL.TIMEOUT: 60:SEC;                     /* adequate for    */
+ 149    ADJUSTABLE STALE.DATA.TIMEOUT: 120:SEC;                   /* most            */
+ 150    ADJUSTABLE XMIT.ACK.TIMEOUT:   120:SEC;                   /* applications.   */
+ 151    ADJUSTABLE INDICATION.BROADCAST.INTERVAL: 60:SEC;         /*******************/
+ 152                                                             
+ 153    /*****************************************************************************/
+ 154    /*   The following parameters default to the appropriate value and need      */
+ 155    /*   not be included in a typical application program.  They are included    */
+ 156    /*   in this program only for reference.                                     */
+ 157    
+ 158         ADJUSTABLE TRANSMITTER.IDLE.STATE: MARK;
+ 159         ADJUSTABLE MCP.LINK.ADDRESS: 0x01;
+ 160         ADJUSTABLE GROUND.LINK.ADDRESS: 0x23;
+ 161         ADJUSTABLE WIU.LINK.ADDRESS: 0x03;
+ 162         ADJUSTABLE CHANNEL.GROUP: 0x68;
+ 163    
+ 164    /*****************************************************************************/
+ 165    
+ 166    ADJUSTABLE MCP.ATCS.ADDRESS: "AAAAAAAAAAAAAA";
+ 167    ADJUSTABLE DEFAULT.ATCS.HOST.ADDRESS: "AAAAAAAAAA";
+ 168    ADJUSTABLE HEALTH.ATCS.ADDRESS: "AAAAAAAAAAAAAA";
+ 169    ADJUSTABLE ADDRESS: "AAAAAAAAAAAAAA"
+ 170    
+ 171    ADJUSTABLE ENABLE: 1
+ 172    STATION.NAME: CP784;
+ 173    
+ 174    NV.OUTPUT:
+ 175           1NWK_ATCS,		1RWK_ATCS,		1LK_ATCS,		1NJK_ATCS,
+ 176    2GK_ATCS,		4_6GK_ATCS,		TEK_ATCS,		SPARE,		
+ 177           2TK_ATCS,		SPARE,		2AK_ATCS,		4AK_ATCS,
+ 178           6AK_ATCS,		2AAK_ATCS,		4AAK_ATCS,		6AAK_ATCS,		
+ 179           2TBK_ATCS, 		4TBK_ATCS,		6TBK_ATCS,		2BDK_ATCS,		
+ 180           4BDK_ATCS,		6BDK_ATCS,		POK_ATCS,		LOK_ATCS,
+ 181           ECK_ATCS,		FLTK_ATCS, 		SMOK_ATCS, 		MOK_ATCS,
+ 182           SPARE,		SPARE,		SPARE,		SPARE;
+ 183    
+ 184    NV.INPUT:
+ 185           C1NWS_ATCS,		C1RWS_ATCS,		SPARE,		SPARE,
+ 186           C2GS_ATCS,		C4_6GS_ATCS,	CSTOP_ATCS,		SPARE,
+ 187           C2TBS_ATCS,		C2TBSO_ATCS,	C4TBS_ATCS,		C4TBSO_ATCS, 
+ 188           C6TBS_ATCS,		C6TBSO_ATCS,	SPARE,		SPARE,
+ 189           SPARE,		SPARE,		SPARE,		SPARE,
+ 190           SPARE,		SPARE,		SPARE,		SPARE,
+ 191           CECS_ATCS,		CECSO_ATCS,		CFLTS_ATCS,		CFLTSO_ATCS,
+ 192           CMOAS_ATCS,		CMOASO_ATCS,	SPARE,		SPARE;
+ 193    
+ 194    
+ 195    
+ 196    LINK: LCP  /* GETS LCP */
+ 197    ADJUSTABLE ENABLE: 1 
+ 198    PROTOCOL: SLCP  
+ 199    ADJUSTABLE PORT:                 2;
+ 200    ADJUSTABLE BAUD:              1200;      // default - need not be specified
+ 201    ADJUSTABLE PARITY:            EVEN;      // default - need not be specified
+ 202    ADJUSTABLE STOPBITS:             1;      // default - need not be specified
+ 203    ADJUSTABLE POINT.POINT:          1;      // default - need not be specified
+ 204    ADJUSTABLE KEY.ON.DELAY:         0;      // default - need not be specified
+ 205    ADJUSTABLE KEY.OFF.DELAY:        0;      // default - need not be specified
+ 206    ADJUSTABLE STALE.DATA.TIMEOUT:  80:SEC;  //   1000ms - 600000ms
+ 207    ADJUSTABLE NORESPONSE.TIMEOUT:   2:SEC;  //     50ms -  25000ms
+ 208    ADJUSTABLE POLLING.INTERVAL:    30:SEC;  // 0,1000ms -  60000ms
+ 209    ADJUSTABLE BROADCAST.INTERVAL:  60:SEC;  // 0,1000ms -  60000ms
+ 210    ADJUSTABLE INTERBYTE.TIMEOUT:   10:MSEC; // 0,  10ms -     50ms
+ 211    
+ 212    ADDRESS: 0 
+ 213    /* ONLY ADDRESS 0 IS USABLE FOR THIS SLCP PROTOCOL */ 
+ 214    
+ 215    ADJUSTABLE ENABLE: 1 
+ 216    /* 1=ADDRESS ENABLED     0=ADDRESS DISABLED */
+ 217    
+ 218    NV.OUTPUT:
+ 219           SPARE,		SPARE,		SPARE,		SPARE,
+ 220           SPARE,		SPARE,		SPARE,		SPARE,
+ 221           SPARE,		SPARE,		SPARE,		SPARE,
+ 222           SPARE,		SPARE,		SPARE,		SPARE,
+ 223           LP1NWK,		LP1RWK,		LP1LK,		LP1NJK,
+ 224           LP2GK,		LP4_6GK,		LPTEK,		LP2TBK,		
+ 225           LP4TBK,		LP6TBK, 		LP2TK,   		LP2AK,
+ 226           LP4AK,		LP6AK,		LP2AAK,		LP4AAK,
+ 227           LP6AAK,		SPARE,		SPARE,		LP2BDK,		
+ 228           LP4BDK,		LP6BDK, 		LPPOK,		LPLOK,	
+ 229           LPECK,		SPARE,		SPARE,		SPARE,		
+ 230           LPFLTK, 		LPLSRESK, 		LPMOK, 		LPINDK;
+ 231           
+ 232    NV.INPUT:
+ 233           LPLMPTEST,		LPSTART,		SPARE,		SPARE,
+ 234           SPARE,		SPARE,		LPLOCAL,		LPREMOTE,
+ 235           SPARE,		SPARE,		SPARE,		SPARE,
+ 236           SPARE,		SPARE,		SPARE,		LPHEALTH,
+ 237           LP1NWS,		LP1RWS,		SPARE,		SPARE,
+ 238           LP2GS,		LP4_6GS,		LPSTOP,		LP2TBZ,
+ 239           LP4TBZ,		LP6TBZ,		SPARE,		SPARE,		
+ 240           SPARE,		SPARE,		SPARE,		SPARE,
+ 241           SPARE,		SPARE,		SPARE,		SPARE,
+ 242           SPARE,		SPARE,		SPARE,		SPARE,
+ 243           SPARE,		SPARE,		SPARE,		SPARE,		
+ 244           LPFLZ,		LPLSRESREQ,		SPARE,		LPINDONLY;
+ 245    
+ 246    
+ 247    
+ 248    NV.BOOLEAN BITS
+ 249    
+ 250           F1TER,	F2TER, 	F1TE,		F2TE,				
+ 251           CLTDLVRY, 	INDMOZP, 	LPLSRESP, 	MOZPR,
+ 252           1WCBCTER, 	1WCBCTE,	ITISR,	FLTDWN,
+ 253           2TBNISR,	2TBFISR,	LP2TBONP,	LP2TBOFP,	
+ 254           4TBNISR,	4TBFISR, 	LP4TBONP,	LP4TBOFP,
+ 255           6TBNISR,	6TBFISR, 	LP6TBONP,	LP6TBOFP,
+ 256           MOASR;
+ 257    
+ 258    
+ 259    TIMER BITS
+ 260    
+ 261           FIXED		F1TER,
+ 262           F2TER:		SET=500:MSEC	CLEAR=0:SEC;
+   -1-
+   -2-
+ 263           
+ 264           FIXED		1WCBCTER:		SET=5:SEC		CLEAR=0:SEC;
+   -3-
+ 265    
+ 266           FIXED		CLTDLVRY: 		SET=0:SEC		CLEAR=1:SEC;
+   -4-
+ 267           
+ 268           
+ 269    
+ 270    
+ 271    LOG BITS
+ 272    
+ 273           1NWSR,	1RWSR,	2GSR,		4_6GSR,	CSTOPR,
+ 274           2TBON,	2TBOFF,	4TBON,	4TBOFF,	6TBON,     6TBOFF,
+ 275           ECSON,	ECSOFF,	FLTS,		FLTSO,	MOSR,		LSRESREQ,
+ 276           HEALTH,	OFFICELINK,	RADIOLINK,
+ 277           1NWCKR,	1RWCKR,	1WCBKR,	1NJPKR,	2RGPKR,	4RGPKR,	
+ 278           6RGPKR,	TEKR,		2TKR, 	2AKR, 	4AKR, 	6AKR,
+ 279           2AAKR,	4AAKR,	6AAKR,	2MKR,		4MKR,		6MKR,		
+ 280           2TBKR,	4TBKR,	6TBKR,	2LSKR,	4LSKR,	6LSKR,	
+ 281           1LKR,		MOKR,		POKR,		LOKR,		ECKR, 	1NWSKR,	
+ 282           1RWSKR,	2GZSKR,	4_6GZSKR,	2TBZNKR,	2TBZFKR,	4TBZNKR,	
+ 283           4TBZFKR,	6TBZNKR,	6TBZFKR,	FLTKR,	SMOKR,	MOASR,
+ 284           1NWK_GEN,	1RWK_GEN,	1LK_GEN,	1NJK_GEN,	2GK_GEN,	4_6GK_GEN,	
+ 285           TEK_GEN,	2TK_GEN,	2AK_GEN,	4AK_GEN,	6AK_GEN,	2AAK_GEN,	
+ 286           4AAK_GEN,	6AAK_GEN,	2TBK_GEN, 	4TBK_GEN,	6TBK_GEN,	2BDK_GEN,		
+ 287           4BDK_GEN,	6BDK_GEN,	POK_GEN,	LOK_GEN,	ECK_GEN,	FLTK_GEN, 	
+ 288           SMOK_GEN, 	MOK_GEN,	C1NWS_GEN,	C1RWS_GEN,	C2GS_GEN,	C4_6GS_GEN,
+ 289           CSTOP_GEN,	C2TBS_GEN,	C2TBSO_GEN,	C4TBS_GEN,	C4TBSO_GEN, C6TBS_GEN,	
+ 290           C6TBSO_GEN,	CECS_GEN,	CECSO_GEN,	CFLTS_GEN,	CFLTSO_GEN, CMOAS_GEN,
+ 291           CMOASO_GEN,
+ 292           1NWK_ATCS,	1RWK_ATCS,	1LK_ATCS,	1NJK_ATCS,	2GK_ATCS,	4_6GK_ATCS,	
+ 293           TEK_ATCS,	2TK_ATCS,	2AK_ATCS,	4AK_ATCS,	6AK_ATCS,	2AAK_ATCS,	
+ 294           4AAK_ATCS,	6AAK_ATCS,	2TBK_ATCS, 	4TBK_ATCS,	6TBK_ATCS,	2BDK_ATCS,		
+ 295           4BDK_ATCS,	6BDK_ATCS,	POK_ATCS,	LOK_ATCS,	ECK_ATCS,	FLTK_ATCS, 	
+ 296           SMOK_ATCS, 	MOK_ATCS,	C1NWS_ATCS,	C1RWS_ATCS,	C2GS_ATCS,	C4_6GS_ATCS,
+ 297           CSTOP_ATCS,	C2TBS_ATCS,	C2TBSO_ATCS,C4TBS_ATCS,C4TBSO_ATCS,C6TBS_ATCS,	
+ 298           C6TBSO_ATCS,CECS_ATCS,	CECSO_ATCS,	CFLTS_ATCS,CFLTSO_ATCS,
+ 299           CMOAS_ATCS,	CMOASO_ATCS,
+ 300           LP1LK,	LP1NJK,	LP2TK,   	LP2AK,
+ 301           LP4AK,	LP6AK,	LP2AAK,	LP4AAK,	LP6AAK,	LP2BDK,		
+ 302           LP4BDK,	LP6BDK, 	LPPOK,	LPLOK,	LPECK,
+ 303           LPFLTK, 	LPLSRESK, 	LPMOK, 	LPINDK,	LPLMPTEST,	LPSTART,		LPLOCAL,	LPREMOTE,	LPHEALTH,	LP1NWS,	LP1RWS,	LP2GS,		LP4_6GS,	LPSTOP,	LP2TBZ,	LP4TBZ,	LP6TBZ,	LPFLZ,		LPLSRESREQ,	LPINDONLY,	CLTDLVRY, 	INDMOZP,
+ 304           LPLSRESP, 	MOZPR,	1WCBCTER, 	1WCBCTE,	ITISR,	FLTDWN,
+ 305           2TBNISR,	2TBFISR,	LP2TBONP,	LP2TBOFP,	4TBNISR,	4TBFISR, 
+ 306           LP4TBONP,	LP4TBOFP,	6TBNISR,	6TBFISR, 	LP6TBONP,	LP6TBOFP;
+ 307    
+ 308    
+ 309    
+ 310    CONFIGURATION
+ 311    
+ 312       SYSTEM
+ 313    
+ 314        ADJUSTABLE DEBUG_PORT_ADDRESS:1;
+ 315        ADJUSTABLE DEBUG_PORT_BAUDRATE:9600;
+ 316        ADJUSTABLE LOGIC_TIMEOUT:1000:MSEC;
+ 317        ADJUSTABLE DELAY_RESET:0:MSEC;
+ 318    
+ 319    
+ 320    
+ 321    
+ 322    LOGIC BEGIN
+ 323    
+ 324    
+ 325    /* NONVITAL LOGIC SECTION - CONTROL LOGIC */
+ 326    
+ 327      NV.ASSIGN (C1NWS_GEN 
+ 328                + C1NWS_ATCS) * ~MOZPR * CLTDLVRY
+ 329                + LP1NWS * MOZPR * LPSTART					TO 1NWSR;
+   -5-
+ 330    
+ 331      NV.ASSIGN (C1RWS_GEN 
+ 332                + C1RWS_ATCS) * ~MOZPR * CLTDLVRY 
+ 333                + LP1RWS * MOZPR * LPSTART					TO 1RWSR;
+   -6-
+ 334    
+ 335      NV.ASSIGN (C2GS_GEN 
+ 336                + C2GS_ATCS) * ~MOZPR * CLTDLVRY 
+ 337                + LP2GS * MOZPR * LPSTART					TO 2GSR;
+   -7-
+ 338    
+ 339      NV.ASSIGN (C4_6GS_GEN 
+ 340                + C4_6GS_ATCS) * ~MOZPR * CLTDLVRY 
+ 341                + LP4_6GS * MOZPR * LPSTART					TO 4_6GSR;
+   -8-
+ 342    
+ 343      NV.ASSIGN (CSTOP_GEN 
+ 344                + CSTOP_ATCS) * ~MOZPR * CLTDLVRY 
+ 345                + LPSTOP * MOZPR * LPSTART					TO CSTOPR;
+   -9-
+ 346    
+ 347      NV.ASSIGN ((CFLTS_GEN 
+ 348                + CFLTS_ATCS) * ~MOZPR * CLTDLVRY
+ 349                + ((LPFLZ * ~FLTKR + FLTS)
+ 350                * MOZPR * LPSTART * FLTDWN)) * ~FLTSO			TO FLTS;
+   -10-
+ 351         
+ 352      NV.ASSIGN ((CFLTSO_GEN 
+ 353                + CFLTSO_ATCS) * ~MOZPR * CLTDLVRY
+ 354                + ((LPFLZ * FLTKR + FLTSO)
+ 355                * MOZPR * LPSTART * FLTDWN)) * ~FLTS			TO FLTSO;
+   -11-
+ 356         
+ 357      NV.ASSIGN (~LPFLZ 
+ 358                + FLTDWN) * MOZPR						TO FLTDWN;
+   -12-
+ 359    
+ 360      NV.ASSIGN (CECS_GEN 
+ 361                + CECS_ATCS) * CLTDLVRY					TO ECSON;
+   -13-
+ 362    
+ 363      NV.ASSIGN (CECSO_GEN 
+ 364                + CECSO_ATCS) * CLTDLVRY					TO ECSOFF;
+   -14-
+ 365    
+ 366      NV.ASSIGN (~LP2TBZ + 2TBNISR) * MOZPR 
+ 367                * (2TBZNKR + ~2TBZNKR * ~2TBZFKR)				TO 2TBNISR;
+   -15-
+ 368    
+ 369      NV.ASSIGN (~LP2TBZ + 2TBFISR) * MOZPR * 2TBZFKR			TO 2TBFISR;
+   -16-
+ 370    
+ 371    
+ 372      NV.ASSIGN LP2TBZ * 2TBFISR							TO LP2TBONP;
+   -17-
+ 373    
+ 374      NV.ASSIGN LP2TBZ * 2TBNISR							TO LP2TBOFP;
+   -18-
+ 375    
+ 376    
+ 377      NV.ASSIGN (C2TBS_GEN
+ 378                + C2TBS_ATCS) * ~MOZPR * CLTDLVRY 
+ 379                + LP2TBONP * MOZPR * LPSTART				TO 2TBON;
+   -19-
+ 380    
+ 381      NV.ASSIGN (C2TBSO_GEN
+ 382                + C2TBSO_ATCS) * ~MOZPR * CLTDLVRY 
+ 383                + LP2TBOFP * MOZPR * LPSTART				TO 2TBOFF;
+   -20-
+ 384    
+ 385      NV.ASSIGN (~LP4TBZ + 4TBNISR) * MOZPR 
+ 386                * (4TBZNKR + ~4TBZNKR * ~4TBZFKR)				TO 4TBNISR;
+   -21-
+ 387    
+ 388      NV.ASSIGN (~LP4TBZ + 4TBFISR) * MOZPR * 4TBZFKR			TO 4TBFISR;
+   -22-
+ 389    
+ 390      NV.ASSIGN LP4TBZ * 4TBFISR							TO LP4TBONP;
+   -23-
+ 391    
+ 392      NV.ASSIGN LP4TBZ * 4TBNISR							TO LP4TBOFP;
+   -24-
+ 393    
+ 394      NV.ASSIGN (C4TBS_GEN
+ 395                + C4TBS_ATCS) * ~MOZPR * CLTDLVRY 
+ 396                + LP4TBONP * MOZPR * LPSTART				TO 4TBON;
+   -25-
+ 397    
+ 398      NV.ASSIGN (C4TBSO_GEN
+ 399                + C4TBSO_ATCS) * ~MOZPR * CLTDLVRY 
+ 400                + LP4TBOFP * MOZPR * LPSTART				TO 4TBOFF;
+   -26-
+ 401    
+ 402      NV.ASSIGN (~LP6TBZ + 6TBNISR) * MOZPR 
+ 403                * (6TBZNKR + ~6TBZNKR * ~6TBZFKR)				TO 6TBNISR;
+   -27-
+ 404    
+ 405      NV.ASSIGN (~LP6TBZ + 6TBFISR) * MOZPR * 6TBZFKR			TO 6TBFISR;
+   -28-
+ 406    
+ 407      NV.ASSIGN LP6TBZ * 6TBFISR							TO LP6TBONP;
+   -29-
+ 408    
+ 409      NV.ASSIGN LP6TBZ * 6TBNISR							TO LP6TBOFP;
+   -30-
+ 410    
+ 411      NV.ASSIGN (C6TBS_ATCS
+ 412                + C6TBS_GEN) * ~MOZPR * CLTDLVRY 
+ 413                + LP6TBONP * MOZPR * LPSTART				TO 6TBON; 
+   -31-
+ 414    
+ 415      NV.ASSIGN (C6TBSO_ATCS
+ 416                + C6TBSO_GEN) * ~MOZPR * CLTDLVRY 
+ 417                + LP6TBOFP * MOZPR * LPSTART				TO 6TBOFF;
+   -32-
+ 418    
+ 419      NV.ASSIGN (~LPLSRESREQ
+ 420                + ITISR) * MOZPR * TEKR					TO ITISR;
+   -33-
+ 421    
+ 422      NV.ASSIGN ITISR * LPLSRESREQ * LPSTART				TO LSRESREQ;
+   -34-
+ 423    
+ 424      NV.ASSIGN LSRESREQ + LPLSRESREQ * LPLSRESP				TO LPLSRESP;
+   -35-
+ 425    
+ 426      NV.ASSIGN LPLOCAL * ~ LPREMOTE * LPHEALTH * 
+ 427           (MOASR + (~OFFICELINK) + MOZPR) 				TO MOZPR, MOSR;
+   -36-
+ 428    
+ 429    NV.ASSIGN CMOAS_GEN + CMOAS_ATCS + 
+ 430           (~CMOASO_GEN * ~CMOASO_ATCS * MOASR) 			TO MOASR;
+   -37-
+ 431    
+ 432    
+ 433    /* NONVITAL LOGIC SECTION - INDICATION LOGIC */
+ 434    
+ 435      NV.ASSIGN ~F2TE									TO F1TE,
+ 436    											   F1TER;
+   -38-
+ 437    
+ 438      NV.ASSIGN F1TER + ~F2TER * F2TE						TO F2TE,
+ 439    											   F2TER;
+   -39-
+ 440    
+ 441      NV.ASSIGN LPHEALTH								TO HEALTH,
+ 442        											   LED.2;
+   -40-
+ 443    
+ 444      NV.ASSIGN GEN_OFFICE.0.STATUS + ATCS_OFFICE.CP784.STATUS	TO OFFICELINK,
+ 445      											   RADIOLINK,
+ 446       											   LED.1;
+   -41-
+ 447    
+ 448      NV.ASSIGN LPINDONLY + MOZPR						TO INDMOZP;
+   -42-
+ 449    
+ 450      NV.ASSIGN ((1NWCKR
+ 451                 + 1NWSKR * F1TE) * ~1WCBCTE
+ 452                 + 1WCBCTER * F1TE) * INDMOZP 
+ 453                 + LPLMPTEST							TO LP1NWK;
+   -43-
+ 454     
+ 455      NV.ASSIGN ((1RWCKR
+ 456                 + 1RWSKR * F1TE) * ~1WCBCTE
+ 457                 + 1WCBCTER * F1TE) * INDMOZP
+ 458                 + LPLMPTEST							TO LP1RWK;
+   -44-
+ 459    
+ 460      NV.ASSIGN ~1LKR * INDMOZP + LPLMPTEST					TO LP1LK;
+   -45-
+ 461    
+ 462      NV.ASSIGN ~1NJPKR * INDMOZP + LPLMPTEST				TO LP1NJK;
+   -46-
+ 463    
+ 464      NV.ASSIGN (~2RGPKR
+ 465                + 2GZSKR * F1TE) * INDMOZP
+ 466                + LPLMPTEST							TO LP2GK;
+   -47-
+ 467    
+ 468      NV.ASSIGN (~4RGPKR + ~6RGPKR
+ 469                + 4_6GZSKR * F1TE) * INDMOZP
+ 470                + LPLMPTEST							TO LP4_6GK;
+   -48-
+ 471    
+ 472      NV.ASSIGN (2LSKR * 4LSKR * 6LSKR
+ 473                + TEKR * F1TE) * INDMOZP 
+ 474                + LPLMPTEST							TO LPTEK;
+   -49-
+ 475    
+ 476    
+ 477    
+ 478      NV.ASSIGN FLTKR * INDMOZP + LPLMPTEST					TO LPFLTK;
+   -50-
+ 479    
+ 480      NV.ASSIGN ~2TKR * INDMOZP + LPLMPTEST					TO LP2TK;
+   -51-
+ 481    
+ 482      NV.ASSIGN ~2AKR * INDMOZP + LPLMPTEST					TO LP2AK;
+   -52-
+ 483    
+ 484      NV.ASSIGN ~4AKR * INDMOZP + LPLMPTEST					TO LP4AK;
+   -53-
+ 485    
+ 486      NV.ASSIGN ~6AKR * INDMOZP + LPLMPTEST					TO LP6AK;
+   -54-
+ 487    
+ 488      NV.ASSIGN ~2AAKR * INDMOZP + LPLMPTEST				TO LP2AAK;
+   -55-
+ 489    
+ 490      NV.ASSIGN ~4AAKR * INDMOZP + LPLMPTEST				TO LP4AAK;
+   -56-
+ 491    
+ 492      NV.ASSIGN ~6AAKR * INDMOZP + LPLMPTEST				TO LP6AAK;
+   -57-
+ 493    
+ 494      NV.ASSIGN ~2MKR * INDMOZP + LPLMPTEST					TO LP2BDK;
+   -58-
+ 495    
+ 496      NV.ASSIGN ~4MKR * INDMOZP + LPLMPTEST					TO LP4BDK;
+   -59-
+ 497    
+ 498      NV.ASSIGN ~6MKR * INDMOZP + LPLMPTEST					TO LP6BDK;
+   -60-
+ 499    
+ 500      NV.ASSIGN (2TBKR
+ 501                + 2TBZNKR * F1TE) * INDMOZP
+ 502                + LPLMPTEST							TO LP2TBK;
+   -61-
+ 503    
+ 504      NV.ASSIGN (4TBKR 
+ 505                + 4TBZNKR * F1TE) * INDMOZP
+ 506                + LPLMPTEST							TO LP4TBK;
+   -62-
+ 507    
+ 508      NV.ASSIGN (6TBKR
+ 509                + 6TBZNKR * F1TE) * INDMOZP
+ 510                + LPLMPTEST							TO LP6TBK;
+   -63-
+ 511    
+ 512      NV.ASSIGN (ECKR
+ 513                + 1WCBCTER) * INDMOZP
+ 514                + LPLMPTEST							TO LPECK;
+   -64-
+ 515    
+ 516      NV.ASSIGN MOKR * ~LPSTART + LPLMPTEST					TO LPMOK;
+   -65-
+ 517    
+ 518    
+ 519    
+ 520    
+ 521      NV.ASSIGN ~POKR * INDMOZP
+ 522                + LPLMPTEST							TO LPPOK;
+   -66-
+ 523    
+ 524      NV.ASSIGN ~LOKR * INDMOZP + LPLMPTEST					TO LPLOK;
+   -67-
+ 525    
+ 526      NV.ASSIGN LPLSRESP * INDMOZP
+ 527                + LPLMPTEST							TO LPLSRESK;
+   -68-
+ 528    
+ 529      NV.ASSIGN LPINDONLY + LPLMPTEST						TO LPINDK;
+   -69-
+ 530    
+ 531    
+ 532      NV.ASSIGN 1NWCKR								TO 1NWK_GEN,
+ 533      											   1NWK_ATCS;
+   -70-
+ 534    
+ 535      NV.ASSIGN 1RWCKR								TO 1RWK_GEN,
+ 536      											   1RWK_ATCS;
+   -71-
+ 537    
+ 538      NV.ASSIGN ~1LKR									TO 1LK_GEN,
+ 539      											   1LK_ATCS;
+   -72-
+ 540    
+ 541      NV.ASSIGN ~1NJPKR								TO 1NJK_GEN,
+ 542      											   1NJK_ATCS;
+   -73-
+ 543    
+ 544      NV.ASSIGN ~2RGPKR								TO 2GK_GEN,
+ 545      											   2GK_ATCS;
+   -74-
+ 546    
+ 547      NV.ASSIGN ~4RGPKR + ~6RGPKR						TO 4_6GK_GEN,
+ 548      											   4_6GK_ATCS;
+   -75-
+ 549    
+ 550      NV.ASSIGN TEKR									TO TEK_GEN,
+ 551                                                                      TEK_ATCS;
+   -76-
+ 552    
+ 553      NV.ASSIGN FLTKR									TO FLTK_GEN,
+ 554    											   FLTK_ATCS;
+   -77-
+ 555    
+ 556      NV.ASSIGN ~2TKR									TO 2TK_GEN,
+ 557    											   2TK_ATCS;
+   -78-
+ 558    
+ 559      NV.ASSIGN ~2AKR									TO 2AK_GEN,
+ 560    											   2AK_ATCS;
+   -79-
+ 561    
+ 562      NV.ASSIGN ~4AKR									TO 4AK_GEN,
+ 563    											   4AK_ATCS;
+   -80-
+ 564    
+ 565      NV.ASSIGN ~6AKR 								TO 6AK_GEN,
+ 566    											   6AK_ATCS;
+   -81-
+ 567    
+ 568    
+ 569      NV.ASSIGN ~2AAKR 								TO 2AAK_GEN,
+ 570    											   2AAK_ATCS;
+   -82-
+ 571    
+ 572      NV.ASSIGN ~4AAKR								TO 4AAK_GEN,
+ 573      											   4AAK_ATCS;
+   -83-
+ 574    
+ 575      NV.ASSIGN ~6AAKR								TO 6AAK_GEN,
+ 576    											   6AAK_ATCS;
+   -84-
+ 577    
+ 578      NV.ASSIGN ~2MKR 								TO 2BDK_GEN,
+ 579    											   2BDK_ATCS;
+   -85-
+ 580    
+ 581      NV.ASSIGN ~4MKR									TO 4BDK_GEN,
+ 582      											   4BDK_ATCS;
+   -86-
+ 583    
+ 584      NV.ASSIGN ~6MKR									TO 6BDK_GEN,
+ 585    											   6BDK_ATCS;
+   -87-
+ 586    
+ 587      NV.ASSIGN 2TBKR									TO 2TBK_GEN,
+ 588              2TBK_ATCS;
+   -88-
+ 589    
+ 590      NV.ASSIGN 4TBKR									TO 4TBK_GEN,
+ 591              4TBK_ATCS;
+   -89-
+ 592    
+ 593      NV.ASSIGN 6TBKR									TO 6TBK_GEN,
+ 594              6TBK_ATCS;
+   -90-
+ 595    
+ 596      NV.ASSIGN ~1WCBKR * (1NWCKR + 1RWCKR)					TO 1WCBCTE,
+ 597    											   1WCBCTER;     
+   -91-
+ 598    
+ 599      NV.ASSIGN ECKR + 1WCBCTER							TO ECK_GEN,
+ 600              ECK_ATCS;
+   -92-
+ 601    
+ 602      NV.ASSIGN MOKR									TO MOK_GEN,
+ 603              MOK_ATCS;
+   -93-
+ 604    
+ 605      NV.ASSIGN ~POKR									TO POK_GEN,
+ 606              POK_ATCS;
+   -94-
+ 607    
+ 608      NV.ASSIGN ~LOKR									TO LOK_GEN,
+ 609              LOK_ATCS;
+   -95-
+ 610           
+ 611      NV.ASSIGN ~SMOKR								TO SMOK_GEN,
+ 612              SMOK_ATCS;
+   -96-
+ 613    
+ 614    
+ 615    END LOGIC
+ 616     
+ 617    
+ 618    
+ 619    NUMERIC BEGIN
+ 620    
+ 621    BLOCK 1 TRIGGERS ON ATCS_OFFICE.CP784.Inputs.Received AND STALE AFTER 0:SEC;
+   -97-
+ 622    
+ 623      NV.ASSIGN ~CLTDLVRY								TO CLTDLVRY;
+   -98-
+ 624      NV.ASSIGN ~CLTDLVRY								TO CLTDLVRY;
+   -99-
+ 625    
+ 626    END BLOCK
+ 627    
+ 628    BLOCK 2 TRIGGERS ON GEN_OFFICE.0.Inputs.Received AND STALE AFTER 0:SEC;
+   -100-
+ 629    
+ 630      NV.ASSIGN ~CLTDLVRY								TO CLTDLVRY;
+   -101-
+ 631      NV.ASSIGN ~CLTDLVRY								TO CLTDLVRY;
+   -102-
+ 632    
+ 633    END BLOCK
+ 634    
+ 635    END NUMERIC
+ 636    
+ 637    END PROGRAM
+ 638    
+
+
+
+ *** Created on Tue Apr 30 09:18:29 2013
+ by GENISYS II Compiler Version 7.30 (N800202-0001)
+
+
+ *** Application Image Summary:
+
+    Target: GENISYS II
+    Application Image CRC: 4687
+    Application Image Checksum: 4e9b
+
+
+ *** Unassigned User-Defined Output Bits:
+
+None Found
+
+
+ *** Unused User-Defined Input Bits:
+
+None Found
+
+
+ *** Unused or Unassigned Internal Bits:
+
+
+
+ *** Bit Usage Summary:
+
+                CONTACT      # TIMES USED
+                 TYPE        AS A TRIGGER
+     BIT     ------------- -----------------    #
+   # NAME     FRONT  BACK  BLOCK TABLE  CODE  ASGNS  TARG  VITALITY
+   1 RESET        0     0      0     0     0     - SYSTEM    NON  OUT
+   2 QUICK.RESET 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+   3 KILL         0     0      0     0     0     - SYSTEM    NON  OUT
+   4 CPS.ENABLE   0     0      0     0     0     - SYSTEM  VITAL  OUT
+   5 CPS.STATUS   0     0      0     0     0     - SYSTEM    NON   IN
+   6 USER.RESTRICTED 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+   7 ERROR.RESTRICTED 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+   8 CONFIGURE.ERROR 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+   9 LAMP.RESET.OPTION 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  10 CLOCK.FREEZE 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+  11 CLOCK.SET    0     0      0     0     0     - SYSTEM    NON  OUT
+  12 PEER.CLOCK.SET 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+  13 PCMCIA.INSTALLED 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  14 LOG.OK       0     0      0     0     0     - SYSTEM    NON   IN
+  15 BATTERY.HEALTH 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  16 LOG.LARGE    0     0      0     0     0     - SYSTEM    NON   IN
+  17 LOG.FULL     0     0      0     0     0     - SYSTEM    NON   IN
+  18 AUX1.INPUT   0     0      0     0     0     - SYSTEM    NON   IN
+  19 AUX2.INPUT   0     0      0     0     0     - SYSTEM    NON   IN
+  20 AUX3.INPUT   0     0      0     0     0     - SYSTEM    NON   IN
+  21 AUX4.INPUT   0     0      0     0     0     - SYSTEM    NON   IN
+  22 AUX5.INPUT   0     0      0     0     0     - SYSTEM    NON   IN
+  23 AUX6.INPUT   0     0      0     0     0     - SYSTEM    NON   IN
+  24 AUX7.INPUT   0     0      0     0     0     - SYSTEM    NON   IN
+  25 AUX8.INPUT   0     0      0     0     0     - SYSTEM    NON   IN
+  26 AUX9.INPUT   0     0      0     0     0     - SYSTEM    NON   IN
+  27 AUX10.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  28 AUX11.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  29 AUX12.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  30 AUX13.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  31 AUX14.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  32 AUX15.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  33 AUX16.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  34 AUX17.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  35 AUX18.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  36 AUX19.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  37 AUX20.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  38 AUX21.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  39 AUX22.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  40 AUX23.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  41 AUX24.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  42 AUX25.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  43 AUX26.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  44 AUX27.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  45 AUX28.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  46 AUX29.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  47 AUX30.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  48 AUX31.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  49 AUX32.INPUT 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  50 LED.1        0     0      0     0     0     1 SYSTEM    NON  OUT
+  51 LED.2        0     0      0     0     0     1 SYSTEM    NON  OUT
+  52 LED.3        0     0      0     0     0     - SYSTEM    NON  OUT
+  53 LED.4        0     0      0     0     0     - SYSTEM    NON  OUT
+  54 LED.5        0     0      0     0     0     - SYSTEM    NON  OUT
+  55 LED.6        0     0      0     0     0     - SYSTEM    NON  OUT
+  56 LED.7        0     0      0     0     0     - SYSTEM    NON  OUT
+  57 LED.8        0     0      0     0     0     - SYSTEM    NON  OUT
+  58 ALARM.1      0     0      0     0     0     - SYSTEM    NON  OUT
+  59 ALARM.2      0     0      0     0     0     - SYSTEM    NON  OUT
+  60 CPS.RESET    0     0      0     0     0     - SYSTEM    NON  OUT
+  61 [unused bit 2] 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+  62 [unused bit 3] 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+  63 [unused bit 4] 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+  64 [unused bit 5] 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+  65 MLK_II.Enabled 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  66 MLK_II.Disable 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+  67 MLK_II.Standby 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  68 MLK_II.1.Enabled 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  69 MLK_II.1.Status 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  70 MLK_II.1.Inputs.Received 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+  71 1NWSR        0     0      0     0     0     1  NASGN    NON  OUT
+  72 1RWSR        0     0      0     0     0     1  NASGN    NON  OUT
+  73 2GSR         0     0      0     0     0     1  NASGN    NON  OUT
+  74 4_6GSR       0     0      0     0     0     1  NASGN    NON  OUT
+  75 CSTOPR       0     0      0     0     0     1  NASGN    NON  OUT
+  77 ECSON        0     0      0     0     0     1  NASGN    NON  OUT
+  78 ECSOFF       0     0      0     0     0     1  NASGN    NON  OUT
+  79 2TBON        0     0      0     0     0     1  NASGN    NON  OUT
+  80 2TBOFF       0     0      0     0     0     1  NASGN    NON  OUT
+  81 4TBON        0     0      0     0     0     1  NASGN    NON  OUT
+  82 4TBOFF       0     0      0     0     0     1  NASGN    NON  OUT
+  83 6TBON        0     0      0     0     0     1  NASGN    NON  OUT
+  84 6TBOFF       0     0      0     0     0     1  NASGN    NON  OUT
+  86 MOSR         0     0      0     0     0     1  NASGN    NON  OUT
+  87 LSRESREQ     1     0      0     0     0     1  NASGN    NON  OUT
+  88 HEALTH       0     0      0     0     0     1  NASGN    NON  OUT
+  89 OFFICELINK   0     1      0     0     0     1  NASGN    NON  OUT
+  90 RADIOLINK    0     0      0     0     0     1  NASGN    NON  OUT
+  93 FLTS         1     1      0     0     0     1  NASGN    NON  OUT
+  94 FLTSO        1     1      0     0     0     1  NASGN    NON  OUT
+  95 1NWCKR       3     0      0     0     0     -      -    NON   IN
+  96 1RWCKR       3     0      0     0     0     -      -    NON   IN
+  97 1WCBKR       0     1      0     0     0     -      -    NON   IN
+  98 1NJPKR       0     2      0     0     0     -      -    NON   IN
+  99 2RGPKR       0     2      0     0     0     -      -    NON   IN
+ 100 4RGPKR       0     2      0     0     0     -      -    NON   IN
+ 101 6RGPKR       0     2      0     0     0     -      -    NON   IN
+ 102 TEKR         3     0      0     0     0     -      -    NON   IN
+ 103 2TKR         0     2      0     0     0     -      -    NON   IN
+ 104 2AKR         0     2      0     0     0     -      -    NON   IN
+ 105 4AKR         0     2      0     0     0     -      -    NON   IN
+ 106 6AKR         0     2      0     0     0     -      -    NON   IN
+ 107 2AAKR        0     2      0     0     0     -      -    NON   IN
+ 108 4AAKR        0     2      0     0     0     -      -    NON   IN
+ 109 6AAKR        0     2      0     0     0     -      -    NON   IN
+ 110 2MKR         0     2      0     0     0     -      -    NON   IN
+ 111 4MKR         0     2      0     0     0     -      -    NON   IN
+ 112 6MKR         0     2      0     0     0     -      -    NON   IN
+ 115 2TBKR        2     0      0     0     0     -      -    NON   IN
+ 116 4TBKR        2     0      0     0     0     -      -    NON   IN
+ 117 6TBKR        2     0      0     0     0     -      -    NON   IN
+ 119 2LSKR        1     0      0     0     0     -      -    NON   IN
+ 120 4LSKR        1     0      0     0     0     -      -    NON   IN
+ 121 6LSKR        1     0      0     0     0     -      -    NON   IN
+ 122 1LKR         0     2      0     0     0     -      -    NON   IN
+ 123 MOKR         2     0      0     0     0     -      -    NON   IN
+ 124 POKR         0     2      0     0     0     -      -    NON   IN
+ 125 LOKR         0     2      0     0     0     -      -    NON   IN
+ 126 ECKR         2     0      0     0     0     -      -    NON   IN
+ 127 1NWSKR       1     0      0     0     0     -      -    NON   IN
+ 128 1RWSKR       1     0      0     0     0     -      -    NON   IN
+ 129 2GZSKR       1     0      0     0     0     -      -    NON   IN
+ 130 4_6GZSKR     1     0      0     0     0     -      -    NON   IN
+ 131 2TBZNKR      2     1      0     0     0     -      -    NON   IN
+ 132 2TBZFKR      1     1      0     0     0     -      -    NON   IN
+ 133 4TBZNKR      2     1      0     0     0     -      -    NON   IN
+ 134 4TBZFKR      1     1      0     0     0     -      -    NON   IN
+ 135 6TBZNKR      2     1      0     0     0     -      -    NON   IN
+ 136 6TBZFKR      1     1      0     0     0     -      -    NON   IN
+ 138 FLTKR        3     1      0     0     0     -      -    NON   IN
+ 139 SMOKR        0     1      0     0     0     -      -    NON   IN
+ 143 GEN_OFFICE.Enabled 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 144 GEN_OFFICE.Disable 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+ 145 GEN_OFFICE.Standby 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 146 GEN_OFFICE.0.Enabled 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 147 GEN_OFFICE.0.Status 
+                  1     0      0     0     0     - SYSTEM    NON   IN
+ 148 GEN_OFFICE.0.Inputs.Received 
+                  0     0      1     0     0     - SYSTEM    NON   IN
+ 149 1NWK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 150 1RWK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 151 1LK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 152 1NJK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 153 2GK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 154 4_6GK_GEN    0     0      0     0     0     1  NASGN    NON  OUT
+ 155 TEK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 157 2TK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 159 2AK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 160 4AK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 161 6AK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 162 2AAK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 163 4AAK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 164 6AAK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 165 2TBK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 166 4TBK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 167 6TBK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 168 2BDK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 169 4BDK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 170 6BDK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 171 POK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 172 LOK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 173 ECK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 174 FLTK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 175 SMOK_GEN     0     0      0     0     0     1  NASGN    NON  OUT
+ 176 MOK_GEN      0     0      0     0     0     1  NASGN    NON  OUT
+ 181 C1NWS_GEN    1     0      0     0     0     -      -    NON   IN
+ 182 C1RWS_GEN    1     0      0     0     0     -      -    NON   IN
+ 185 C2GS_GEN     1     0      0     0     0     -      -    NON   IN
+ 186 C4_6GS_GEN   1     0      0     0     0     -      -    NON   IN
+ 187 CSTOP_GEN    1     0      0     0     0     -      -    NON   IN
+ 189 C2TBS_GEN    1     0      0     0     0     -      -    NON   IN
+ 190 C2TBSO_GEN   1     0      0     0     0     -      -    NON   IN
+ 191 C4TBS_GEN    1     0      0     0     0     -      -    NON   IN
+ 192 C4TBSO_GEN   1     0      0     0     0     -      -    NON   IN
+ 193 C6TBS_GEN    1     0      0     0     0     -      -    NON   IN
+ 194 C6TBSO_GEN   1     0      0     0     0     -      -    NON   IN
+ 205 CECS_GEN     1     0      0     0     0     -      -    NON   IN
+ 206 CECSO_GEN    1     0      0     0     0     -      -    NON   IN
+ 207 CFLTS_GEN    1     0      0     0     0     -      -    NON   IN
+ 208 CFLTSO_GEN   1     0      0     0     0     -      -    NON   IN
+ 209 CMOAS_GEN    1     0      0     0     0     -      -    NON   IN
+ 210 CMOASO_GEN   0     1      0     0     0     -      -    NON   IN
+ 213 ATCS_OFFICE.Enabled 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 214 ATCS_OFFICE.Disable 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+ 215 ATCS_OFFICE.Standby 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 216 ATCS_OFFICE.CP784.Enabled 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 217 ATCS_OFFICE.CP784.Status 
+                  1     0      0     0     0     - SYSTEM    NON   IN
+ 218 ATCS_OFFICE.CP784.Inputs.Received 
+                  0     0      1     0     0     - SYSTEM    NON   IN
+ 219 ATCS_OFFICE.CP784.Disable 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+ 220 1NWK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 221 1RWK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 222 1LK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 223 1NJK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 224 2GK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 225 4_6GK_ATCS   0     0      0     0     0     1  NASGN    NON  OUT
+ 226 TEK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 228 2TK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 230 2AK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 231 4AK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 232 6AK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 233 2AAK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 234 4AAK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 235 6AAK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 236 2TBK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 237 4TBK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 238 6TBK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 239 2BDK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 240 4BDK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 241 6BDK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 242 POK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 243 LOK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 244 ECK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 245 FLTK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 246 SMOK_ATCS    0     0      0     0     0     1  NASGN    NON  OUT
+ 247 MOK_ATCS     0     0      0     0     0     1  NASGN    NON  OUT
+ 252 C1NWS_ATCS   1     0      0     0     0     -      -    NON   IN
+ 253 C1RWS_ATCS   1     0      0     0     0     -      -    NON   IN
+ 256 C2GS_ATCS    1     0      0     0     0     -      -    NON   IN
+ 257 C4_6GS_ATCS 
+                  1     0      0     0     0     -      -    NON   IN
+ 258 CSTOP_ATCS   1     0      0     0     0     -      -    NON   IN
+ 260 C2TBS_ATCS   1     0      0     0     0     -      -    NON   IN
+ 261 C2TBSO_ATCS 
+                  1     0      0     0     0     -      -    NON   IN
+ 262 C4TBS_ATCS   1     0      0     0     0     -      -    NON   IN
+ 263 C4TBSO_ATCS 
+                  1     0      0     0     0     -      -    NON   IN
+ 264 C6TBS_ATCS   1     0      0     0     0     -      -    NON   IN
+ 265 C6TBSO_ATCS 
+                  1     0      0     0     0     -      -    NON   IN
+ 276 CECS_ATCS    1     0      0     0     0     -      -    NON   IN
+ 277 CECSO_ATCS   1     0      0     0     0     -      -    NON   IN
+ 278 CFLTS_ATCS   1     0      0     0     0     -      -    NON   IN
+ 279 CFLTSO_ATCS 
+                  1     0      0     0     0     -      -    NON   IN
+ 280 CMOAS_ATCS   1     0      0     0     0     -      -    NON   IN
+ 281 CMOASO_ATCS 
+                  0     1      0     0     0     -      -    NON   IN
+ 284 LCP.Enabled 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 285 LCP.Disable 
+                  0     0      0     0     0     - SYSTEM    NON  OUT
+ 286 LCP.Standby 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 287 LCP.0.Enabled 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 288 LCP.0.Status 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 289 LCP.0.Inputs.Received 
+                  0     0      0     0     0     - SYSTEM    NON   IN
+ 306 LP1NWK       0     0      0     0     0     1  NASGN    NON  OUT
+ 307 LP1RWK       0     0      0     0     0     1  NASGN    NON  OUT
+ 308 LP1LK        0     0      0     0     0     1  NASGN    NON  OUT
+ 309 LP1NJK       0     0      0     0     0     1  NASGN    NON  OUT
+ 310 LP2GK        0     0      0     0     0     1  NASGN    NON  OUT
+ 311 LP4_6GK      0     0      0     0     0     1  NASGN    NON  OUT
+ 312 LPTEK        0     0      0     0     0     1  NASGN    NON  OUT
+ 313 LP2TBK       0     0      0     0     0     1  NASGN    NON  OUT
+ 314 LP4TBK       0     0      0     0     0     1  NASGN    NON  OUT
+ 315 LP6TBK       0     0      0     0     0     1  NASGN    NON  OUT
+ 316 LP2TK        0     0      0     0     0     1  NASGN    NON  OUT
+ 317 LP2AK        0     0      0     0     0     1  NASGN    NON  OUT
+ 318 LP4AK        0     0      0     0     0     1  NASGN    NON  OUT
+ 319 LP6AK        0     0      0     0     0     1  NASGN    NON  OUT
+ 320 LP2AAK       0     0      0     0     0     1  NASGN    NON  OUT
+ 321 LP4AAK       0     0      0     0     0     1  NASGN    NON  OUT
+ 322 LP6AAK       0     0      0     0     0     1  NASGN    NON  OUT
+ 325 LP2BDK       0     0      0     0     0     1  NASGN    NON  OUT
+ 326 LP4BDK       0     0      0     0     0     1  NASGN    NON  OUT
+ 327 LP6BDK       0     0      0     0     0     1  NASGN    NON  OUT
+ 328 LPPOK        0     0      0     0     0     1  NASGN    NON  OUT
+ 329 LPLOK        0     0      0     0     0     1  NASGN    NON  OUT
+ 330 LPECK        0     0      0     0     0     1  NASGN    NON  OUT
+ 334 LPFLTK       0     0      0     0     0     1  NASGN    NON  OUT
+ 335 LPLSRESK     0     0      0     0     0     1  NASGN    NON  OUT
+ 336 LPMOK        0     0      0     0     0     1  NASGN    NON  OUT
+ 337 LPINDK       0     0      0     0     0     1  NASGN    NON  OUT
+ 338 LPLMPTEST   27     0      0     0     0     -      -    NON   IN
+ 339 LPSTART     14     1      0     0     0     -      -    NON   IN
+ 344 LPLOCAL      1     0      0     0     0     -      -    NON   IN
+ 345 LPREMOTE     0     1      0     0     0     -      -    NON   IN
+ 353 LPHEALTH     2     0      0     0     0     -      -    NON   IN
+ 354 LP1NWS       1     0      0     0     0     -      -    NON   IN
+ 355 LP1RWS       1     0      0     0     0     -      -    NON   IN
+ 358 LP2GS        1     0      0     0     0     -      -    NON   IN
+ 359 LP4_6GS      1     0      0     0     0     -      -    NON   IN
+ 360 LPSTOP       1     0      0     0     0     -      -    NON   IN
+ 361 LP2TBZ       2     2      0     0     0     -      -    NON   IN
+ 362 LP4TBZ       2     2      0     0     0     -      -    NON   IN
+ 363 LP6TBZ       2     2      0     0     0     -      -    NON   IN
+ 382 LPFLZ        2     1      0     0     0     -      -    NON   IN
+ 383 LPLSRESREQ   2     1      0     0     0     -      -    NON   IN
+ 385 LPINDONLY    2     0      0     0     0     -      -    NON   IN
+ 386 F1TER        1     0      0     0     0     1  NASGN    NON  INT
+ 387 F2TER        0     1      0     0     0     1  NASGN    NON  INT
+ 388 F1TE        10     0      0     0     0     1  NASGN    NON  INT
+ 389 F2TE         1     1      0     0     0     1  NASGN    NON  INT
+ 390 CLTDLVRY    15     0      0     0     0     4  NASGN    NON  INT
+ 391 INDMOZP     25     0      0     0     0     1  NASGN    NON  INT
+ 392 LPLSRESP     2     0      0     0     0     1  NASGN    NON  INT
+ 393 MOZPR       23    13      0     0     0     1  NASGN    NON  INT
+ 394 1WCBCTER     4     0      0     0     0     1  NASGN    NON  INT
+ 395 1WCBCTE      0     2      0     0     0     1  NASGN    NON  INT
+ 396 ITISR        2     0      0     0     0     1  NASGN    NON  INT
+ 397 FLTDWN       3     0      0     0     0     1  NASGN    NON  INT
+ 398 2TBNISR      2     0      0     0     0     1  NASGN    NON  INT
+ 399 2TBFISR      2     0      0     0     0     1  NASGN    NON  INT
+ 400 LP2TBONP     1     0      0     0     0     1  NASGN    NON  INT
+ 401 LP2TBOFP     1     0      0     0     0     1  NASGN    NON  INT
+ 402 4TBNISR      2     0      0     0     0     1  NASGN    NON  INT
+ 403 4TBFISR      2     0      0     0     0     1  NASGN    NON  INT
+ 404 LP4TBONP     1     0      0     0     0     1  NASGN    NON  INT
+ 405 LP4TBOFP     1     0      0     0     0     1  NASGN    NON  INT
+ 406 6TBNISR      2     0      0     0     0     1  NASGN    NON  INT
+ 407 6TBFISR      2     0      0     0     0     1  NASGN    NON  INT
+ 408 LP6TBONP     1     0      0     0     0     1  NASGN    NON  INT
+ 409 LP6TBOFP     1     0      0     0     0     1  NASGN    NON  INT
+ 410 MOASR        2     0      0     0     0     1  NASGN    NON  INT
+ 411 EVALUATE.MATH.ERROR.1 
+                  0     0      0     0     0     - SYSTEM  VITAL  INT
+ 412 EVALUATE.MATH.ERROR.2 
+                  0     0      0     0     0     - SYSTEM  VITAL  INT
+
+
+ *** Numeric Usage Summary:
+
+   # NAME                     MINIMUM    MAXIMUM      ERROR    INITIAL EVAL  TARGET  VITAL
+ 413 CLOCK.MONTH          -2147483648 2147483647          0          0    -  SYSTEM    NON  OUT
+ 414 CLOCK.DAY            -2147483648 2147483647          0          0    -  SYSTEM    NON  OUT
+ 415 CLOCK.YEAR           -2147483648 2147483647          0          0    -  SYSTEM    NON  OUT
+ 416 CLOCK.HOUR           -2147483648 2147483647          0          0    -  SYSTEM    NON  OUT
+ 417 CLOCK.MINUTE         -2147483648 2147483647          0          0    -  SYSTEM    NON  OUT
+ 418 CLOCK.SECOND         -2147483648 2147483647          0          0    -  SYSTEM    NON  OUT
+ 419 [unused numeric 1]   -2147483648 2147483647          0          0    -  SYSTEM    NON  OUT
+ 420 [unused numeric 2]   -2147483648 2147483647          0          0    -  SYSTEM    NON  OUT
+
+ *** Link Summary:
+
+    MLK_II:  Genisys Master
+      MLK_II.Enabled:  1 (Vital Adjustable)
+      Point.Point:  1 (Vital Adjustable)
+      Port:  1 (Vital Adjustable)
+      BAUD:  9600 (Non-vital Adjustable)
+      StopBits:  1 (Non-vital Adjustable)
+      Parity:  0 (Non-vital Adjustable)
+      Key.On.Delay:  12 (Non-vital Adjustable)
+      Key.Off.Delay:  12 (Non-vital Adjustable)
+      Master.Timeout:  500 msec (Fixed)
+      Polling.Interval:  50 msec (Fixed)
+      Stale.Data.Timeout:  5000 msec (Non-vital Adjustable)
+      Configurable.Station.Address:  0 (Non-vital Adjustable)
+      Carrier.Mode:  0 (Non-vital Adjustable)
+      Secure.Mode:  0 (Fixed)
+      CRC.Size:  16 (Non-vital Adjustable)
+      Master.CheckBack:  0 (Fixed)
+      Standby.Port:  0 (Fixed)
+      MLK_II.1.Enabled:  1 (Non-vital Adjustable)
+
+    GEN_OFFICE:  Genisys Slave
+      GEN_OFFICE.Enabled:  0 (Vital Adjustable)
+      Point.Point:  1 (Vital Adjustable)
+      Port:  3 (Vital Adjustable)
+      BAUD:  9600 (Non-vital Adjustable)
+      StopBits:  1 (Non-vital Adjustable)
+      Parity:  0 (Non-vital Adjustable)
+      Key.On.Delay:  12 (Non-vital Adjustable)
+      Key.Off.Delay:  12 (Non-vital Adjustable)
+      Stale.Data.Timeout:  5000 msec (Non-vital Adjustable)
+      Configurable.Station.Address:  0 (Non-vital Adjustable)
+      Carrier.Mode:  1 (Non-vital Adjustable)
+      CRC.Size:  16 (Non-vital Adjustable)
+      Standby.Port:  0 (Fixed)
+      GEN_OFFICE.0.Enabled:  1 (Non-vital Adjustable)
+
+    ATCS_OFFICE:  ATCS Slave
+      ATCS_OFFICE.Enabled:  0 (Vital Adjustable)
+      Port:  3 (Vital Adjustable)
+      BAUD:  9600 (Non-vital Adjustable)
+      Polling.Timeout:  500 (Non-vital Adjustable)
+      Polling.Interval:  1000 (Non-vital Adjustable)
+      HDLC.Fail.Timeout:  60000 (Non-vital Adjustable)
+      Stale.Data.Timeout:  120000 (Non-vital Adjustable)
+      Xmit.Ack.Timeout:  120000 (Non-vital Adjustable)
+      Indication.Broadcast.Interval:  60000 (Non-vital Adjustable)
+      Transmitter.Idle.State:  0 (Non-vital Adjustable)
+      MCP.Link.Address:  1 (Non-vital Adjustable)
+      Ground.Link.Address:  0x23 (Non-vital Adjustable)
+      WIU.Link.Address:  0x03 (Non-vital Adjustable)
+      Channel.Group:  104 (Non-vital Adjustable)
+      MCP.Atcs.Address:  0 (Vital Adjustable)
+      Default.Atcs.Host.Address:  0 (Vital Adjustable)
+      Health.Atcs.Address:  0 (Vital Adjustable)
+      ATCS_OFFICE.CP784.Enabled:  1 (Non-vital Adjustable)
+      ATCS_OFFICE.CP784.SET.CLOCK.ENABLE:  1 (Fixed)
+      ATCS_OFFICE.CP784.Atcs.Station.Address:  2863311530 (Non-vital Adjustable)
+      ATCS_OFFICE.CP784.Host.Address:  0 (Non-vital Adjustable)
+
+    LCP:  SLCP
+      LCP.Enabled:  1 (Vital Adjustable)
+      Point.Point:  1 (Vital Adjustable)
+      Port:  2 (Vital Adjustable)
+      BAUD:  1200 (Non-vital Adjustable)
+      StopBits:  1 (Non-vital Adjustable)
+      Parity:  2 (Non-vital Adjustable)
+      Key.On.Delay:  0 (Non-vital Adjustable)
+      Key.Off.Delay:  0 (Non-vital Adjustable)
+      Noresponse.Timeout:  2000 (Non-vital Adjustable)
+      Polling.Interval:  30000 (Non-vital Adjustable)
+      Stale.Data.Timeout:  80000 (Non-vital Adjustable)
+      Configurable.Station.Address:  0 (Non-vital Adjustable)
+      Interbyte.Timeout:  10 (Non-vital Adjustable)
+      Broadcast.Interval:  60000 (Non-vital Adjustable)
+      LCP.0.Enabled:  1 (Non-vital Adjustable)
+
+
+ *** System Level Configuration Parameters: 
+
+     ApplicationChecksum:  0 (Vital Adjustable)
+     ExecutiveChecksum:  0 (Vital Adjustable)
+     Executive.Version:  0 (Fixed)
+     Application.Version:  0 (Fixed)
+     Event.Threshold.1:  1 (Non-vital Adjustable)
+     Event.Threshold.2:  1 (Non-vital Adjustable)
+     Event.Threshold.3:  1 (Non-vital Adjustable)
+     Event.Threshold.4:  1 (Non-vital Adjustable)
+     Event.Threshold.5:  1 (Non-vital Adjustable)
+     Event.Threshold.6:  1 (Non-vital Adjustable)
+     Event.Threshold.7:  1 (Non-vital Adjustable)
+     Event.Threshold.8:  1 (Non-vital Adjustable)
+     Event.Threshold.9:  1 (Non-vital Adjustable)
+     Event.Threshold.10:  1 (Non-vital Adjustable)
+     Event.Threshold.11:  1 (Non-vital Adjustable)
+     Event.Threshold.12:  1 (Non-vital Adjustable)
+     Event.Threshold.13:  1 (Non-vital Adjustable)
+     Event.Threshold.14:  1 (Non-vital Adjustable)
+     Event.Threshold.15:  1 (Non-vital Adjustable)
+     Event.Threshold.16:  1 (Non-vital Adjustable)
+     Event.Threshold.17:  1 (Non-vital Adjustable)
+     Event.Threshold.18:  1 (Non-vital Adjustable)
+     Event.Threshold.19:  1 (Non-vital Adjustable)
+     Event.Threshold.20:  1 (Non-vital Adjustable)
+     Event.Threshold.21:  1 (Non-vital Adjustable)
+     Event.Threshold.22:  1 (Non-vital Adjustable)
+     Event.Threshold.23:  1 (Non-vital Adjustable)
+     Event.Threshold.24:  1 (Non-vital Adjustable)
+     Event.Threshold.25:  1 (Non-vital Adjustable)
+     Event.Threshold.26:  1 (Non-vital Adjustable)
+     Event.Threshold.27:  1 (Non-vital Adjustable)
+     Event.Threshold.28:  1 (Non-vital Adjustable)
+     Event.Threshold.29:  1 (Non-vital Adjustable)
+     Event.Threshold.30:  1 (Non-vital Adjustable)
+     Event.Threshold.31:  1 (Non-vital Adjustable)
+     Event.Threshold.32:  1 (Non-vital Adjustable)
+     Event.Threshold.33:  1 (Non-vital Adjustable)
+     Event.Threshold.34:  1 (Non-vital Adjustable)
+     Event.Threshold.35:  1 (Non-vital Adjustable)
+     Event.Threshold.36:  1 (Non-vital Adjustable)
+     Event.Threshold.37:  1 (Non-vital Adjustable)
+     Event.Threshold.38:  1 (Non-vital Adjustable)
+     Event.Threshold.39:  1 (Non-vital Adjustable)
+     Event.Threshold.40:  1 (Non-vital Adjustable)
+     Event.Threshold.41:  1 (Non-vital Adjustable)
+     Event.Threshold.42:  1 (Non-vital Adjustable)
+     Event.Threshold.43:  1 (Non-vital Adjustable)
+     Event.Threshold.44:  1 (Non-vital Adjustable)
+     Event.Threshold.45:  1 (Non-vital Adjustable)
+     Event.Threshold.46:  1 (Non-vital Adjustable)
+     Event.Threshold.47:  1 (Non-vital Adjustable)
+     Event.Threshold.48:  1 (Non-vital Adjustable)
+     Event.Threshold.49:  1 (Non-vital Adjustable)
+     Event.Threshold.50:  1 (Non-vital Adjustable)
+     Event.Threshold.51:  1 (Non-vital Adjustable)
+     Event.Threshold.52:  1 (Non-vital Adjustable)
+     Event.Threshold.53:  1 (Non-vital Adjustable)
+     Event.Threshold.54:  1 (Non-vital Adjustable)
+     Event.Threshold.55:  1 (Non-vital Adjustable)
+     Event.Threshold.56:  1 (Non-vital Adjustable)
+     Event.Threshold.57:  1 (Non-vital Adjustable)
+     Event.Threshold.58:  1 (Non-vital Adjustable)
+     Event.Threshold.59:  1 (Non-vital Adjustable)
+     Event.Threshold.60:  1 (Non-vital Adjustable)
+     Event.Threshold.61:  1 (Non-vital Adjustable)
+     Event.Threshold.62:  1 (Non-vital Adjustable)
+     Event.Threshold.63:  1 (Non-vital Adjustable)
+     Event.Threshold.64:  1 (Non-vital Adjustable)
+     Logic.Timeout:  1000 (Vital Adjustable)
+     Configuration.Compatibility:  0 (Fixed)
+     PC.Vital.Config.Date:  0 (Vital Adjustable)
+     PC.NV.Config.Date:  0 (Non-vital Adjustable)
+     Front.Vital.Config.Date:  0 (Vital Adjustable)
+     Front.NV.Config.Date:  0 (Non-vital Adjustable)
+     Password:  0 (Vital Adjustable)
+     Debug.Port.Address:  1 (Non-vital Adjustable)
+     Debug.Port.Baudrate:  9600 (Non-vital Adjustable)
+     Delay.Reset:  0 (Vital Adjustable)
